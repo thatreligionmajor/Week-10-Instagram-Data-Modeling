@@ -7,26 +7,132 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
+class User(Base):
+    __tablename__ = 'user'
     # Here we define columns for the table person
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String(30), nullable=False)
+    firstname = Column(String(30), nullable=False)
+    lastname = Column(String(30), nullable=False)
+    email = Column(String(30), nullable=False)
 
-class Address(Base):
-    __tablename__ = 'address'
+    def serialize(self):
+        return{
+            "username": self.username,
+            "firstname": self.firstname,
+            "lastname": self.lastname,
+            "email": self.email,
+        }
+
+
+class Follower(Base):
+    __tablename__ = 'follower'
     # Here we define columns for the table address.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    following_user_id = relationship(User)
+    followed_user_id = relationship(User)
 
-    def to_dict(self):
-        return {}
+    def serialize(self):
+        return {
+            #nothing, I believe
+        }
+
+class Post(Base):
+    __tablename__ = 'post'
+    id = Column(Integer, primary_key=True)
+    user_id = relationship(User)
+    post_date = Column(Integer, nullable=False)
+    post_time = Column(Integer, nullable=False)
+    caption = Column(String, nullable=True)
+
+    def serialize(self):
+        return {
+            "post_date": self.post_date,
+            "post_time": self.post_time,
+            "caption": self.caption,
+        }
+
+class Filter(Base):
+    __tablename__ = 'filter'
+    id = Column(Integer, primary_key=True)
+    filter_name = Column(String, nullable=True)
+
+    def serialize(self):
+        return {
+            "filter_name": self.filter_name,
+        }
+
+class Media(Base):
+    __tablename__ = 'media'
+    id = Column(Integer, primary_key=True)
+    type = Column(String, nullable=False)
+    url = Column(String, nullable=False)
+    filter_id = relationship(Filter)
+    post_position = Column(Integer, nullable=False)
+    latitude = Column(String, nullable=True)
+    longitude = Column(String, nullable=True)
+
+    def serialize(self):
+        return {
+            "type": self.type,
+            "url": self.url,
+            "post_position": self.post_position,
+            "latitude": self.latitude,
+            "longitude": self.longitude
+        } 
+
+class Effect(Base):
+    __tablename__ = 'effect'
+    id = Column(Integer, primary_key=True)
+    type = Column(String, nullable=False)
+
+    def serialize(self):
+        return {
+            #nothing, I believe
+        }
+
+class Media_Effects(Base):
+    __tablename__ = 'media_effects'
+    id = Column(Integer, primary_key=True)
+    media_id = relationship(Media)
+    effect_id = relationship(Effect)
+    scale = Column(Integer, nullable=True)
+
+    def serialize(self):
+        return {
+            "effect_id": self.effect_id,
+            "scale": self.scale
+        }
+    
+class Post_Media_User_Tag(Base):
+    __tablename__ = 'post_media_user_tag'
+    id = Column(Integer, primary_key=True)
+    post_media_id = Column(String, nullable=False)
+
+    def serialize(self):
+        return {
+            #something "": self.,
+        }
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    id = Column(Integer, primary_key=True)
+    comment_text = Column(String, nullable=True)
+    author_id = Column(Integer, ForeignKey('user.id'))
+    post_id = Column(Integer, ForeignKey('post.id'))
+    comment_date = Column(String, nullable=True)
+    comment_time = Column(String, nullable=True)
+
+    def serialize(self):
+        return {
+            "comment_text": self.comment_text,
+            "author_id": self.author_id,
+            "post_id": self.post_id,
+            "comment_date": self.comment_date,
+            "comment_time": self.comment_time,
+        }
 
 ## Draw from SQLAlchemy base
 try:
