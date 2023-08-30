@@ -31,8 +31,8 @@ class Follower(Base):
     # Here we define columns for the table address.
     # Notice that each column is also a normal Python instance attribute.
     id = Column(Integer, primary_key=True)
-    following_user_id = relationship(User)
-    followed_user_id = relationship(User)
+    following_user_id = Column(Integer, ForeignKey('user.id'))
+    followed_user_id = Column(Integer, ForeignKey('user.id'))
 
     def serialize(self):
         return {
@@ -57,6 +57,7 @@ class Post(Base):
 class Filter(Base):
     __tablename__ = 'filter'
     id = Column(Integer, primary_key=True)
+    media_id = Column(Integer, ForeignKey('media.id'))
     filter_name = Column(String, nullable=True)
 
     def serialize(self):
@@ -66,6 +67,7 @@ class Filter(Base):
 
 class Media(Base):
     __tablename__ = 'media'
+    post_id = Column(Integer, ForeignKey('post.id'))
     id = Column(Integer, primary_key=True)
     type = Column(String, nullable=False)
     url = Column(String, nullable=False)
@@ -83,37 +85,17 @@ class Media(Base):
             "longitude": self.longitude
         } 
 
-class Effect(Base):
-    __tablename__ = 'effect'
-    id = Column(Integer, primary_key=True)
-    type = Column(String, nullable=False)
-
-    def serialize(self):
-        return {
-            #nothing, I believe
-        }
-
 class Media_Effects(Base):
     __tablename__ = 'media_effects'
     id = Column(Integer, primary_key=True)
-    media_id = relationship(Media)
-    effect_id = relationship(Effect)
+    media_relationship = relationship(Media)
+    media_id = Column(Integer, ForeignKey('media.id'))
     scale = Column(Integer, nullable=True)
 
     def serialize(self):
         return {
             "effect_id": self.effect_id,
             "scale": self.scale
-        }
-    
-class Post_Media_User_Tag(Base):
-    __tablename__ = 'post_media_user_tag'
-    id = Column(Integer, primary_key=True)
-    post_media_id = Column(String, nullable=False)
-
-    def serialize(self):
-        return {
-            #something "": self.,
         }
 
 class Comment(Base):
